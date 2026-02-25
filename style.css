@@ -1,0 +1,140 @@
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Product card hover effect */
+.product-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Button press effect */
+button:active {
+    transform: scale(0.95);
+}
+
+/* Image loading placeholder */
+img {
+    background-color: #f3f4f6;
+}
+
+/* Custom focus styles */
+input:focus, select:focus, button:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: rgb(37, 99, 235);
+}
+
+/* Category pill transition */
+.category-pill {
+    transition: all 0.2s ease;
+}
+
+/* Cart item animation */
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.cart-item-animate {
+    animation: slideInRight 0.3s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .hero-gradient {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    }
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Price tag styling */
+.price-tag {
+    position: relative;
+    display: inline-block;
+}
+
+/* Badge positioning */
+.badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Toast notification improvements */
+#toast {
+    backdrop-filter: blur(10px);
+    background-color: rgba(17, 24, 39, 0.95);
+}
+
+/* Modal backdrop blur */
+#productModal {
+    backdrop-filter: blur(4px);
+}
+
+/* Ensure images don't overflow */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Custom selection color */
+::selection {
+    background-color: rgb(37, 99, 235);
+    color: white;
+}

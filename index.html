@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopVista - Online Shopping Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .product-card:hover { transform: translateY(-4px); }
+        .cart-slide { transform: translateX(100%); transition: transform 0.3s ease-in-out; }
+        .cart-slide.open { transform: translateX(0); }
+        .category-pill.active { background-color: rgb(37, 99, 235); color: white; }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="showHome()">
+                    <i data-lucide="shopping-bag" class="h-8 w-8 text-blue-600 mr-2"></i>
+                    <span class="text-2xl font-bold text-blue-600">ShopVista</span>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="hidden md:flex flex-1 max-w-2xl mx-8">
+                    <div class="relative w-full">
+                        <input type="text" id="searchInput" placeholder="Search for products, brands and more..." 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button onclick="handleSearch()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600">
+                            <i data-lucide="search" class="h-5 w-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Icons -->
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleCart()" class="relative p-2 text-gray-600 hover:text-blue-600 transition">
+                        <i data-lucide="shopping-cart" class="h-6 w-6"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:text-blue-600 transition">
+                        <i data-lucide="user" class="h-6 w-6"></i>
+                    </button>
+                    <button class="md:hidden p-2 text-gray-600" onclick="toggleMobileMenu()">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Search -->
+        <div class="md:hidden px-4 pb-3">
+            <div class="relative w-full">
+                <input type="text" id="mobileSearchInput" placeholder="Search products..." 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="handleMobileSearch()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <i data-lucide="search" class="h-5 w-5"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Category Bar -->
+    <div class="bg-white border-b border-gray-200 overflow-x-auto scrollbar-hide">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex space-x-8 py-3" id="categoryBar">
+                <button onclick="filterCategory('all')" class="category-pill active whitespace-nowrap px-4 py-1 rounded-full text-sm font-medium transition">All</button>
+                <button onclick="filterCategory('electronics')" class="category-pill whitespace-nowrap px-4 py-1 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition">Electronics</button>
+                <button onclick="filterCategory('fashion')" class="category-pill whitespace-nowrap px-4 py-1 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition">Fashion</button>
+                <button onclick="filterCategory('home')" class="category-pill whitespace-nowrap px-4 py-1 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition">Home & Living</button>
+                <button onclick="filterCategory('sports')" class="category-pill whitespace-nowrap px-4 py-1 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition">Sports</button>
+                <button onclick="filterCategory('books')" class="category-pill whitespace-nowrap px-4 py-1 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition">Books</button>
+                <button onclick="filterCategory('beauty')" class="category-pill whitespace-nowrap px-4 py-1 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition">Beauty</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div id="heroSection" class="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+            <div class="md:flex items-center justify-between">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Summer Sale is Live! ☀️</h1>
+                    <p class="text-xl mb-6 text-blue-100">Up to 70% off on electronics, fashion, and home essentials. Free shipping on orders over $50.</p>
+                    <button onclick="scrollToProducts()" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition shadow-lg">
+                        Shop Now
+                    </button>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="http://static.photos/technology/640x360/123" alt="Hero" class="rounded-lg shadow-2xl max-w-md w-full object-cover">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deals Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-lg shadow hover:shadow-md transition cursor-pointer">
+                <div class="text-orange-500 font-bold text-lg">Today's Deals</div>
+                <div class="text-gray-600 text-sm">Up to 50% off</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow hover:shadow-md transition cursor-pointer">
+                <div class="text-blue-500 font-bold text-lg">New Arrivals</div>
+                <div class="text-gray-600 text-sm">Latest products</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow hover:shadow-md transition cursor-pointer">
+                <div class="text-green-500 font-bold text-lg">Best Sellers</div>
+                <div class="text-gray-600 text-sm">Top rated items</div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow hover:shadow-md transition cursor-pointer">
+                <div class="text-purple-500 font-bold text-lg">Premium</div>
+                <div class="text-gray-600 text-sm">Exclusive collection</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div id="productsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Featured Products</h2>
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-600">Sort by:</span>
+                <select id="sortSelect" onchange="sortProducts()" class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="featured">Featured</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Products will be injected here -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden flex justify-center items-center py-12">
+            <div class="loader"></div>
+        </div>
+
+        <!-- No Results -->
+        <div id="noResults" class="hidden text-center py-12">
+            <i data-lucide="search-x" class="h-12 w-12 text-gray-400 mx-auto mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900">No products found</h3>
+            <p class="text-gray-600">Try adjusting your search or category filter</p>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div id="cartOverlay" onclick="toggleCart()" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden transition-opacity"></div>
+    <div id="cartSidebar" class="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-2xl z-50 cart-slide overflow-y-auto">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+            <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                <i data-lucide="shopping-cart" class="h-6 w-6 mr-2"></i>
+                Shopping Cart
+                <span id="cartItemCount" class="ml-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            </h2>
+            <button onclick="toggleCart()" class="p-2 hover:bg-gray-100 rounded-full transition">
+                <i data-lucide="x" class="h-6 w-6 text-gray-600"></i>
+            </button>
+        </div>
+        
+        <div id="cartItems" class="p-4 space-y-4">
+            <!-- Cart items injected here -->
+        </div>
+
+        <div id="cartEmpty" class="p-8 text-center">
+            <i data-lucide="shopping-bag" class="h-16 w-16 text-gray-300 mx-auto mb-4"></i>
+            <p class="text-gray-600 mb-4">Your cart is empty</p>
+            <button onclick="toggleCart()" class="text-blue-600 font-medium hover:underline">Continue Shopping</button>
+        </div>
+
+        <div id="cartFooter" class="hidden p-4 border-t border-gray-200 sticky bottom-0 bg-white">
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Subtotal</span>
+                    <span id="cartSubtotal">$0.00</span>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Shipping</span>
+                    <span id="cartShipping">Free</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold text-gray-900 pt-2 border-t">
+                    <span>Total</span>
+                    <span id="cartTotal">$0.00</span>
+                </div>
+            </div>
+            <button onclick="checkout()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition z-10">
+                <i data-lucide="x" class="h-6 w-6"></i>
+            </button>
+            <div id="modalContent" class="p-6 md:p-8">
+                <!-- Content injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 transition-transform duration-300 z-50 flex items-center">
+        <i data-lucide="check-circle" class="h-5 w-5 mr-2 text-green-400"></i>
+        <span id="toastMessage">Added to cart</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i data-lucide="shopping-bag" class="h-6 w-6 mr-2 text-blue-400"></i>
+                        ShopVista
+                    </h3>
+                    <p class="text-gray-400 text-sm">Your one-stop destination for all shopping needs. Quality products, great prices, fast delivery.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition">Press</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Customer Service</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition">Returns</a></li>
+                        <li><a href="#" class="hover:text-white transition">Track Order</a></li>
+                        <li><a href="#" class="hover:text-white transition">Shipping Info</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i data-lucide="facebook" class="h-5 w-5"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i data-lucide="twitter" class="h-5 w-5"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i data-lucide="instagram" class="h-5 w-5"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i data-lucide="youtube" class="h-5 w-5"></i></a>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-sm text-gray-400 mb-2">Subscribe to our newsletter</p>
+                        <div class="flex">
+                            <input type="email" placeholder="Enter email" class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-l-lg focus:outline-none text-sm">
+                            <button class="bg-blue-600 px-4 py-2 rounded-r-lg hover:bg-blue-700 transition">Subscribe</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+                <p>&copy; 2024 ShopVista. All rights reserved. | Privacy Policy | Terms of Service</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+<script src="https://deepsite.hf.co/deepsite-badge.js"></script>
+</body>
+</html>
